@@ -1,0 +1,16 @@
+<!-- for loop tag django template -->
+{% for event_obj in events %}
+<!-- adding variable in djago template -->
+<h1>Event : {{event_obj.title | upper}}</h1>
+<p>Date : {{event_obj.eventdate}}</p>
+<h4>Event theme : {{event_obj.eventtheme | default:'No data Avaialable!'}}</h4>
+
+<!-- if tag in django template -->
+{% if event_obj.status %}
+<h3>Event booked successfully!</h3>
+{% else %}
+<h3>Event not booked</h3>
+{% endif %}
+
+{% endfor %}
+
