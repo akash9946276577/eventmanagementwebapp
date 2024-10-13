@@ -20,5 +20,5 @@ from events import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hello/',views.hello),
+    path('loginprompt/',views.main),
 ]
