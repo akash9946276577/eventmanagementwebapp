@@ -10,6 +10,9 @@ from . forms import EventForm
 def main(request):
     return render(request,'main.html')
 
+def signup(request):
+    return render(request,'signup.html')
+
 # views of showing event page
 def events(request):
 
@@ -72,6 +75,7 @@ def listevent(request):
 
 def editevent(request):
     return render(request,'editevent.html')
+
 
 
 

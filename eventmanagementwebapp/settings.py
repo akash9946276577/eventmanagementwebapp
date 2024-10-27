@@ -38,6 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'events',
+    'event_manager',
+    'event_orders',
+    'event_themes',
+    'eventusers',
+    
 ]
 
 MIDDLEWARE = [

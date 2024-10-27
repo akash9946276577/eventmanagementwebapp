@@ -22,6 +22,7 @@ urlpatterns = [
     path('createevent/', views.createevent, name='createevent'),
     path('editevent/', views.editevent, name='editevent'),
     path('listevent/', views.listevent, name='listevent'),
-    path('loginprompt/',views.main),
-    path('bookedevents/',views.events),
+    path('loginprompt/',views.main, name='loginpage'),
+    path('bookedevents/',views.events, name='events'),
+    path('signup/', views.signup, name='signup'),
 ]
