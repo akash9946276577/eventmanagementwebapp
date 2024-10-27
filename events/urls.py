@@ -1,5 +1,5 @@
 """
-URL configuration for eventmanagementwebapp project.
+URL configuration for eventmanager project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -14,14 +14,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from events import views
 
-
-
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('',include('events.urls'))
+    path('createevent/', views.createevent, name='createevent'),
+    path('editevent/', views.editevent, name='editevent'),
+    path('listevent/', views.listevent, name='listevent'),
+    path('loginprompt/',views.main),
+    path('bookedevents/',views.events),
 ]

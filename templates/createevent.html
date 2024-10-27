@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+
+{% block content %}
+
+<h1>Create Event</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="formGroupExampleInput">Event Type</label>
+      <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Marriage" name="eventtype">
+    </div>
+    <div class="form-group">
+      <label for="formGroupExampleInput2">Audience Count</label>
+      <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="50" name="audiencecount">
+    </div>
+    <div class="form-group">
+        <label for="formGroupExampleInput2">Event Date</label>
+        <input type="date" class="form-control" id="formGroupExampleInput2" placeholder="10/14/2022" name="eventdate">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+{% endblock content %}
+
