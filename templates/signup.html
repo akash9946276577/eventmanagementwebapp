@@ -11,14 +11,23 @@
    
   
                   <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Sign up</p>
-  
-                  <form class="mx-1 mx-md-4">
+                  {% if messages %}
+                  <div>
+                    {% for message in messages %}
+                    <p>{{ message }}</p>
+
+                    {% endfor %}
+
+                  </div> 
+                  {% endif %} 
+                  <form class="mx-1 mx-md-4" method="post" enctype="multipart/form-data" >
+                    {% csrf_token %}
 
                     <div class="input-group form-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-user"></i></span>
 						</div>
-						<input type="text" class="form-control" placeholder="Your Name">
+						<input type="text" class="form-control" placeholder="Your Name" name="username" required maxlength="15">
 						
 					</div>
 
@@ -26,26 +35,34 @@
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-envelope"></i></span>
 						</div>
-						<input type="text" class="form-control" placeholder="Your Email">
+						<input type="email" class="form-control" name="email" placeholder="Your Email">
 						
 					</div>
+
+          <div class="input-group form-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-star"></i></span>
+						</div>
+						<input type="text" class="form-control" placeholder="Address" name="address" required minlength="6">
+						
+					</div>
+
+          <div class="input-group form-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-indent"></i></span>
+						</div>
+						<input type="text" class="form-control" placeholder="Phone" name="phone" required minlength="6">
+						
+					</div>
+
 
                     <div class="input-group form-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-lock"></i></span>
 						</div>
-						<input type="text" class="form-control" placeholder="Password">
+						<input type="password" class="form-control" name="password" minlength="6" placeholder="Password">
 						
 					</div>
-
-                    <div class="input-group form-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text"><i class="fas fa-key"></i></span>
-						</div>
-						<input type="text" class="form-control" placeholder="Repeat your password">
-						
-					</div>
-  
   
                     <div class="form-check d-flex justify-content-center mb-5">
                       <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3c" />
@@ -53,10 +70,10 @@
                         Agree all Terms<a href="#!">Terms of service</a>
                       </label>
                     </div>
-                    <a class="d-flex justify-content-center mx-4 mb-3 mb-lg-4" href="{% url 'loginpage' %}">Sign in</a>
+                    <a class="d-flex justify-content-center mx-4 mb-3 mb-lg-4" href="{% url 'login' %}">Sign in</a>
   
                     <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                      <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn login_btn">Register</button>
+                      <button  type="button" data-mdb-button-init data-mdb-ripple-init name="register" class="btn login_btn">Register</button>
                     </div>
   
                   </form>

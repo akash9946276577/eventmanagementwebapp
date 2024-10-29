@@ -9,7 +9,13 @@ from django.core.paginator import Paginator
 
 # Create your views here.
 def index(request):
-    return render(request,'index.html')
+    featured_events=Event.objects.order_by('priority')[:4]
+    latest_events=Event.objects.order_by('-id')[:8]
+    context={
+        'featured_events':featured_events,
+        'latest_events':latest_events
+    }
+    return render(request,'index.html',context)
 
 # views for available events list
 
@@ -36,12 +42,7 @@ def eventdetails(request,pk):
     context={'event':event}
     return render(request,'eventdetails.html',context)
 
-#views of rendering html page
-def main(request):
-    return render(request,'main.html')
 
-def signup(request):
-    return render(request,'signup.html')
 
 # views of showing event page
 def events(request):
