@@ -5,6 +5,18 @@ from . models import bookedevent
 from . forms import EventForm
 
 # Create your views here.
+def index(request):
+    return render(request,'index.html')
+
+# views for available events list
+
+def eventlist(request):
+    return render(request,'eventlayout.html')
+
+# views for details about event
+
+def eventdetails(request):
+    return render(request,'eventdetails.html')
 
 #views of rendering html page
 def main(request):

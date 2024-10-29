@@ -31,7 +31,7 @@
 <div class="row">
 <div class="col-md-5">
 <div class="card" style="width: 18rem;">
-    <img class="card-img-top" src="{% static 'images/' %}{{event_obj.image}}" alt="Card image cap">
+    <img class="card-img-top" src="{% static '{% static 'images/' %}{{event_obj.image}}" alt="Card image cap">
     <div class="card-body">
       <h5 class="card-title">Event : {{event_obj.title | upper}}</h5>
       <p class="card-text">Event theme : {{event_obj.eventtheme | default:'No data Avaialable!'}}</p>
