@@ -2,7 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import render
 from . models import bookedevent
+from . models import Event
+from . models import decelements
 from . forms import EventForm
+from django.core.paginator import Paginator
 
 # Create your views here.
 def index(request):
@@ -11,12 +14,27 @@ def index(request):
 # views for available events list
 
 def eventlist(request):
-    return render(request,'eventlayout.html')
+    page=1
+    if request.GET:
+        page=request.GET.get('page',1)
+
+    events_list=Event.objects.order_by('priority')
+    events_paginator=Paginator(events_list,3)
+    events_list=events_paginator.get_page(page)
+    context={'events': events_list}
+    return render(request,'eventlayout.html', context)
+
+def decelementlist(request):
+    decelement_list=decelements.objects.all()
+    deccontext={'decelements': decelement_list}
+    return render(request,'eventlayout.html', deccontext)
 
 # views for details about event
 
-def eventdetails(request):
-    return render(request,'eventdetails.html')
+def eventdetails(request,pk):
+    event=Event.objects.get(pk=pk)
+    context={'event':event}
+    return render(request,'eventdetails.html',context)
 
 #views of rendering html page
 def main(request):

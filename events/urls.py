@@ -21,7 +21,7 @@ from . import views
 urlpatterns = [
     path('',views.index, name='home'),
     path('eventlist',views.eventlist,name='eventlist'),
-    path('eventdetails',views.eventdetails,name='eventdetails'),
+    path('eventdetails/<pk>',views.eventdetails,name='eventdetails'),
     path('createevent/', views.createevent, name='createevent'),
     path('editevent/', views.editevent, name='editevent'),
     path('listevent/', views.listevent, name='listevent'),
