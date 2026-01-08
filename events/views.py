@@ -39,7 +39,8 @@ def decelementlist(request):
 
 def eventdetails(request,pk):
     event=Event.objects.get(pk=pk)
-    context={'event':event}
+    related_events=Event.objects.exclude(pk=pk).order_by('priority')[:4]
+    context={'event':event, 'related_events':related_events}
     return render(request,'eventdetails.html',context)
 
 
