@@ -1,55 +1,109 @@
-{% extends 'base.html' %}
+{% extends 'blanklayout.html' %}
+{% load static %}
+
 {% block content %}
+<div class="small-container" style="max-width:600px; margin:50px auto; padding:20px;">
+    <h2 style="text-align:center; margin-bottom:30px;">Payment Gateway</h2>
+    <p style="text-align:center; margin-bottom:30px;">Please review your order and complete the payment.</p>
 
-<div class="small-container" style="max-width:600px; margin:auto; text-align:center;">
-    <h2>Payment Gateway</h2>
-    <p>Please enter your payment details below to complete your booking.</p>
-
-    <table style="width:100%; border-collapse: collapse; margin-bottom:20px;">
-        <tr style="background-color:#f2f2f2; text-align:left;">
-            <th style="padding:10px;">Event</th>
-            <th style="padding:10px;">Guest Count</th>
-            <th style="padding:10px;">Price/Guest</th>
-            <th style="padding:10px;">Total</th>
-        </tr>
-        {% for item in cart_items %}
-        <tr style="border-bottom:1px solid #ddd;">
-            <td style="padding:10px;">{{ item.event.title }}</td>
-            <td style="padding:10px;">{{ item.guestcount }}</td>
-            <td style="padding:10px;">${{ item.event.price }}</td>
-            <td style="padding:10px;">${{ item.event.price|mul:item.guestcount }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <h3>Total Amount: ${{ total_amount }}</h3>
-
-    <form method="POST" action="{% url 'process_payment' %}" 
-          style="display:flex; flex-direction:column; gap:15px; text-align:left; margin-top:30px;">
-        {% csrf_token %}
-
-        <label>Cardholder Name</label>
-        <input type="text" name="card_name" required style="padding:10px; border:1px solid #ccc; border-radius:5px;">
-
-        <label>Card Number</label>
-        <input type="text" name="card_number" maxlength="16" required style="padding:10px; border:1px solid #ccc; border-radius:5px;">
-
-        <div style="display:flex; gap:10px;">
-            <div style="flex:1;">
-                <label>Expiry Date</label>
-                <input type="text" name="expiry" placeholder="MM/YY" required style="padding:10px; border:1px solid #ccc; border-radius:5px;">
-            </div>
-            <div style="flex:1;">
-                <label>CVV</label>
-                <input type="password" name="cvv" maxlength="3" required style="padding:10px; border:1px solid #ccc; border-radius:5px;">
-            </div>
+    <!-- Order Summary -->
+    <div style="background:#f9f9f9; padding:20px; border-radius:8px; margin-bottom:30px;">
+        <h3 style="margin-bottom:15px;">Order Summary</h3>
+        <table style="width:100%; border-collapse: collapse;">
+            <tr style="background-color:#e0e0e0; text-align:left;">
+                <th style="padding:10px; border:1px solid #ddd;">Event</th>
+                <th style="padding:10px; border:1px solid #ddd;">Guests</th>
+                <th style="padding:10px; border:1px solid #ddd;">Price/Guest</th>
+                <th style="padding:10px; border:1px solid #ddd;">Total</th>
+            </tr>
+            {% for item in cart_items %}
+            <tr>
+                <td style="padding:10px; border:1px solid #ddd;">{{ item.event.title }}</td>
+                <td style="padding:10px; border:1px solid #ddd;">{{ item.guestcount }}</td>
+                <td style="padding:10px; border:1px solid #ddd;">₹{{ item.event.quote }}</td>
+                <td style="padding:10px; border:1px solid #ddd;">₹{{ item.event.quote|floatformat:0 }}{% widthratio item.event.quote 1 item.guestcount %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div style="text-align:right; margin-top:15px; font-size:18px; font-weight:bold;">
+            Total Amount: ₹{{ total_amount|floatformat:0 }}
         </div>
+    </div>
 
-        <button type="submit" 
-                style="margin-top:20px; background:#4CAF50; color:#fff; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
-            Pay Now
-        </button>
-    </form>
+    <!-- UPI Payment Form -->
+    <div style="background:#fff; border:2px solid #4CAF50; border-radius:8px; padding:25px;">
+        <h3 style="color:#4CAF50; margin-bottom:20px; text-align:center;">🔒 Secure UPI Payment</h3>
+        
+        <form method="POST" action="{% url 'process_payment' %}" id="paymentForm">
+            {% csrf_token %}
+            
+            <div style="margin-bottom:20px;">
+                <label style="display:block; margin-bottom:8px; font-weight:bold;">Enter UPI ID:</label>
+                <input type="text" 
+                       name="upi_id" 
+                       id="upi_id"
+                       placeholder="yourname@paytm / yourname@gpay / yourname@phonepe" 
+                       required 
+                       style="width:100%; padding:12px; border:2px solid #ddd; border-radius:5px; font-size:16px;">
+                <small style="color:#666; font-size:12px;">Enter your UPI ID (e.g., 9876543210@paytm)</small>
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <label style="display:block; margin-bottom:8px; font-weight:bold;">Payment Method:</label>
+                <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                    <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="radio" name="payment_method" value="gpay" checked style="margin-right:8px;">
+                        <span style="background:#4285f4; color:white; padding:8px 15px; border-radius:20px; font-size:14px;">Google Pay</span>
+                    </label>
+                    <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="radio" name="payment_method" value="paytm" style="margin-right:8px;">
+                        <span style="background:#00baf2; color:white; padding:8px 15px; border-radius:20px; font-size:14px;">Paytm</span>
+                    </label>
+                    <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="radio" name="payment_method" value="phonepe" style="margin-right:8px;">
+                        <span style="background:#5f259f; color:white; padding:8px 15px; border-radius:20px; font-size:14px;">PhonePe</span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" 
+                    id="payButton"
+                    style="width:100%; background:#4CAF50; color:#fff; padding:15px; border:none; border-radius:5px; font-size:18px; font-weight:bold; cursor:pointer; transition:background 0.3s;">
+                Pay ₹{{ total_amount|floatformat:0 }} Now
+            </button>
+        </form>
+    </div>
+
+    <div style="text-align:center; margin-top:20px; color:#666; font-size:14px;">
+        🔒 Your payment is secured with 256-bit SSL encryption
+    </div>
 </div>
+
+<script>
+// Simple form validation
+document.getElementById('paymentForm').addEventListener('submit', function(e) {
+    const upiId = document.getElementById('upi_id').value;
+    const upiPattern = /^[\w.-]+@[\w.-]+$/;
+    
+    if (!upiPattern.test(upiId)) {
+        e.preventDefault();
+        alert('Please enter a valid UPI ID (e.g., yourname@paytm)');
+        return false;
+    }
+    
+    // Show loading state
+    const payButton = document.getElementById('payButton');
+    payButton.innerHTML = 'Processing Payment...';
+    payButton.disabled = true;
+});
+
+// Hover effect for pay button
+document.getElementById('payButton').addEventListener('mouseover', function() {
+    this.style.background = '#45a049';
+});
+document.getElementById('payButton').addEventListener('mouseout', function() {
+    this.style.background = '#4CAF50';
+});
+</script>
 
 {% endblock %}

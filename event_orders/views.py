@@ -86,7 +86,7 @@ def payment_page(request):
 
     total_amount = 0
     for item in items:
-        total_amount += item.event.price * item.guestcount  # Assuming Event model has 'price' field
+        total_amount += item.event.quote * item.guestcount  # Using quote field from Event model
 
     context = {
         'cart_items': items,
@@ -98,7 +98,7 @@ def payment_page(request):
 @login_required
 def process_payment(request):
     """
-    Simulates payment gateway processing.
+    Simulates UPI payment gateway processing.
     You can later integrate Razorpay, Stripe, etc.
     """
     # ✅ Ensure profile exists
@@ -116,17 +116,48 @@ def process_payment(request):
             messages.error(request, "No active cart found!")
             return redirect('orderscart')
 
-        # Simulate payment success
-        cart.delete_status = eventcart.DELETED  # Mark cart as completed
-        cart.save()
+        # Get payment details from form
+        upi_id = request.POST.get('upi_id')
+        payment_method = request.POST.get('payment_method')
+        
+        # Basic UPI ID validation
+        if not upi_id or '@' not in upi_id:
+            messages.error(request, "Please enter a valid UPI ID!")
+            return redirect('payment_page')
 
-        # Optionally mark events as booked
-        for item in cart.added_events.all():
-            item.status = eventbookeditem.BOOKED  # assuming status field exists
-            item.save()
+        # Simulate payment processing (In real implementation, integrate with payment gateway)
+        import time
+        time.sleep(1)  # Simulate processing time
+        
+        # For demo purposes, we'll assume payment is always successful
+        # In real implementation, you would:
+        # 1. Call payment gateway API
+        # 2. Verify payment status
+        # 3. Handle success/failure scenarios
+        
+        payment_successful = True  # This would come from payment gateway response
+        
+        if payment_successful:
+            # Mark cart as completed
+            cart.delete_status = eventcart.DELETE  # Mark cart as completed
+            cart.event_status = eventcart.EVENT_BOOKED  # Mark as booked
+            cart.save()
 
-        messages.success(request, "Payment successful! Your events have been booked.")
-        return redirect('payment_success')
+            # Optionally create a payment record (you can create a Payment model for this)
+            # Payment.objects.create(
+            #     user=request.user,
+            #     cart=cart,
+            #     upi_id=upi_id,
+            #     payment_method=payment_method,
+            #     amount=total_amount,
+            #     status='SUCCESS'
+            # )
+
+            messages.success(request, f"Payment successful via {payment_method.upper()}! Your events have been booked.")
+            return redirect('payment_success')
+        else:
+            messages.error(request, "Payment failed! Please try again.")
+            return redirect('payment_page')
 
     return redirect('payment_page')
 

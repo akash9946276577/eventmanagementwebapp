@@ -1,0 +1,124 @@
+{% extends 'blanklayout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="small-container" style="max-width:600px; margin:50px auto; padding:20px; text-align:center;">
+    
+    <!-- Success Icon -->
+    <div style="margin-bottom:30px;">
+        <div style="width:80px; height:80px; background:#4CAF50; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center;">
+            <span style="color:white; font-size:40px;">✓</span>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <h1 style="color:#4CAF50; margin-bottom:20px;">Payment Successful!</h1>
+    <p style="font-size:18px; color:#666; margin-bottom:30px;">
+        Thank you for your payment. Your event booking has been confirmed.
+    </p>
+
+    <!-- Payment Details -->
+    <div style="background:#f9f9f9; padding:20px; border-radius:8px; margin-bottom:30px; text-align:left;">
+        <h3 style="margin-bottom:15px; text-align:center;">Payment Details</h3>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span><strong>Transaction Status:</strong></span>
+            <span style="color:#4CAF50; font-weight:bold;">Completed</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span><strong>Payment Method:</strong></span>
+            <span>UPI Payment</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span><strong>Transaction ID:</strong></span>
+            <span>#TXN{{ "now"|date:"YmdHis" }}{{ user.id }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+            <span><strong>Date & Time:</strong></span>
+            <span>{{ "now"|date:"d M Y, H:i" }}</span>
+        </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div style="background:#e8f5e8; padding:20px; border-radius:8px; margin-bottom:30px; text-align:left;">
+        <h3 style="color:#4CAF50; margin-bottom:15px; text-align:center;">What's Next?</h3>
+        <ul style="list-style:none; padding:0;">
+            <li style="margin-bottom:10px; display:flex; align-items:center;">
+                <span style="color:#4CAF50; margin-right:10px;">📧</span>
+                A confirmation email will be sent to your registered email address
+            </li>
+            <li style="margin-bottom:10px; display:flex; align-items:center;">
+                <span style="color:#4CAF50; margin-right:10px;">📞</span>
+                Our team will contact you within 24 hours to discuss event details
+            </li>
+            <li style="margin-bottom:10px; display:flex; align-items:center;">
+                <span style="color:#4CAF50; margin-right:10px;">📋</span>
+                You can track your booking status in your account dashboard
+            </li>
+        </ul>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;">
+        <a href="{% url 'events' %}" 
+           style="background:#4CAF50; color:white; padding:12px 25px; text-decoration:none; border-radius:5px; font-weight:bold;">
+            Browse More Events
+        </a>
+        <a href="{% url 'orderscart' %}" 
+           style="background:#2196F3; color:white; padding:12px 25px; text-decoration:none; border-radius:5px; font-weight:bold;">
+            View Cart
+        </a>
+    </div>
+
+    <!-- Support Info -->
+    <div style="margin-top:40px; padding:20px; background:#f0f0f0; border-radius:8px;">
+        <h4 style="margin-bottom:10px;">Need Help?</h4>
+        <p style="color:#666; margin-bottom:10px;">
+            If you have any questions about your booking, please contact our support team:
+        </p>
+        <p style="color:#4CAF50; font-weight:bold;">
+            📞 +91-XXXXXXXXXX | 📧 support@eventmanagement.com
+        </p>
+    </div>
+
+</div>
+
+<script>
+// Auto redirect after 30 seconds (optional)
+setTimeout(function() {
+    // Uncomment the line below if you want auto-redirect
+    // window.location.href = "{% url 'events' %}";
+}, 30000);
+
+// Confetti effect (simple)
+function createConfetti() {
+    const colors = ['#4CAF50', '#2196F3', '#FF9800', '#E91E63'];
+    for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.style.position = 'fixed';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.top = '-10px';
+        confetti.style.width = '10px';
+        confetti.style.height = '10px';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.borderRadius = '50%';
+        confetti.style.pointerEvents = 'none';
+        confetti.style.zIndex = '9999';
+        document.body.appendChild(confetti);
+        
+        const animation = confetti.animate([
+            { transform: 'translateY(-10px) rotate(0deg)', opacity: 1 },
+            { transform: `translateY(100vh) rotate(360deg)`, opacity: 0 }
+        ], {
+            duration: Math.random() * 2000 + 1000,
+            easing: 'ease-out'
+        });
+        
+        animation.onfinish = () => confetti.remove();
+    }
+}
+
+// Trigger confetti on page load
+window.addEventListener('load', createConfetti);
+</script>
+
+{% endblock %}
