@@ -1,0 +1,64 @@
+{% load static %}
+    
+    <!-- Feadtued Categories -->
+
+    <div class="categories">
+        <div class="small-container">
+            <div class="row">
+                <div class="col-3">
+                    <img src="{% static 'images/categoryimg1.png' %}">
+                </div>
+                <div class="col-3">
+                    <img src="{% static 'images/categoryimage2.png' %}">
+                </div>
+                <div class="col-3">
+                    <img src="{% static 'images/categoryimage3.png' %}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Products -->
+
+    <div class="small-container">
+        <h2 class="title">Featured Events</h2>
+        <div class="row">
+            {% for event in featured_events %}
+            <div class="col-4">
+                <img src="{{ event.image.url }}"></a>
+                <h4>{{ event.title }}</h4>
+                <div class="rating">
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star-o"></i>
+                </div>
+                <p class="price">${{ event.quote }}</p>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    <!-- latest Products -->
+
+        <h2 class="title">Latest Decorative Elements</h2>
+        <div class="row">
+            {% for event in latest_events %}
+            <div class="col-4">
+                <img src="{{ event.image.url }}"></a>
+                <h4>{{ event.title }}</h4>
+                <div class="rating">
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star-o"></i>
+                </div>
+                <p class="price">${{ event.quote }}</p>
+            </div>
+
+            {% endfor %}
+        </div>
+    </div>

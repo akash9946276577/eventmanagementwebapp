@@ -1,0 +1,245 @@
+trigger:
+- main
+
+pool:
+  name: event-agent-pool
+
+variables:
+  acrName: 'eventwebappacr'
+  imageName: 'event-management-app'
+  aksCluster: 'event-aks'
+  aksResourceGroup: 'event-rg-central'
+  tag: '$(Build.BuildId)'
+  latestTag: 'latest'
+  dockerImage: '$(acrName).azurecr.io/$(imageName):$(Build.BuildId)'
+
+stages:
+
+# ============================================
+# BUILD & PUSH STAGE
+# ============================================
+- stage: Build
+  displayName: "Build and Push Docker Image"
+  jobs:
+  - job: BuildJob
+    displayName: "Build & Push Docker Image to ACR"
+    steps:
+    - checkout: self
+
+    - task: Docker@2
+      displayName: "Login to ACR"
+      inputs:
+        command: login
+        containerRegistry: "PipelineconnectionACR"
+
+    - task: Docker@2
+      displayName: "Build and Push Docker Image (No Cache)"
+      inputs:
+        command: buildAndPush
+        repository: "$(imageName)"
+        dockerfile: "**/Dockerfile"
+        containerRegistry: "PipelineconnectionACR"
+        arguments: "--no-cache"
+        tags: |
+          $(tag)
+          $(latestTag)
+
+    - script: |
+        echo "Successfully pushed image:"
+        echo "$(acrName).azurecr.io/$(imageName):$(tag)"
+        echo "Also tagged as latest."
+      displayName: "Confirm Push"
+
+# ============================================
+# DEV DEPLOYMENT
+# ============================================
+- stage: DeployToDev
+  displayName: "Deploy to Dev (Blue-Green)"
+  dependsOn: Build
+  jobs:
+  - job: DeployDev
+    displayName: "Deploy to AKS (Dev)"
+    pool:
+      name: event-agent-pool
+    steps:
+    - task: AzureCLI@2
+      displayName: "Deploy Blue (Dev)"
+      inputs:
+        azureSubscription: "PipelineconnectionAKS"
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          echo "Deploying Blue environment to Dev..."
+          kubectl create namespace dev --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -n dev -f - <<EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: eventwebapp-blue
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: eventwebapp
+                version: blue
+            template:
+              metadata:
+                labels:
+                  app: eventwebapp
+                  version: blue
+              spec:
+                containers:
+                - name: eventwebapp
+                  image: $(dockerImage)
+                  imagePullPolicy: Always
+                  ports:
+                  - containerPort: 8000
+                  env:
+                  - name: DJANGO_SETTINGS_MODULE
+                    value: eventmanagementwebapp.settings
+                  - name: DEBUG
+                    value: "True"
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: eventwebapp-service
+          spec:
+            selector:
+              app: eventwebapp
+              version: blue
+            ports:
+            - port: 8000
+              targetPort: 8000
+            type: LoadBalancer
+          EOF
+
+# ============================================
+# STAGING DEPLOYMENT
+# ============================================
+- stage: DeployToStaging
+  displayName: "Deploy to Staging"
+  dependsOn: DeployToDev
+  jobs:
+  - job: DeployStaging
+    displayName: "Deploy to AKS (Staging)"
+    pool:
+      name: event-agent-pool
+    steps:
+    - task: AzureCLI@2
+      displayName: "Deploy Green (Staging)"
+      inputs:
+        azureSubscription: "PipelineconnectionAKS"
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          echo "" Deploying Green environment to Staging..."
+          kubectl create namespace staging --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -n staging -f - <<EOF
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: eventwebapp-green
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: eventwebapp
+                version: green
+            template:
+              metadata:
+                labels:
+                  app: eventwebapp
+                  version: green
+              spec:
+                containers:
+                - name: eventwebapp
+                  image: $(dockerImage)
+                  imagePullPolicy: Always
+                  ports:
+                  - containerPort: 8000
+                  env:
+                  - name: DJANGO_SETTINGS_MODULE
+                    value: eventmanagementwebapp.settings
+                  - name: DEBUG
+                    value: "True"
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: eventwebapp-service
+          spec:
+            selector:
+              app: eventwebapp
+              version: green
+            ports:
+            - port: 8000
+              targetPort: 8000
+            type: LoadBalancer
+          EOF
+
+# ============================================
+# PRODUCTION DEPLOYMENT (WITH APPROVAL)
+# ============================================
+- stage: DeployToProd
+  displayName: "Deploy to Production"
+  dependsOn: DeployToStaging
+  condition: succeeded()
+  jobs:
+  - deployment: DeployProd
+    displayName: "Deploy to AKS (Production)"
+    environment: "production"
+    pool:
+      name: event-agent-pool
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureCLI@2
+            displayName: "Deploy Blue-Green (Prod)"
+            inputs:
+              azureSubscription: "PipelineconnectionAKS"
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                echo "Deploying to Production (Blue-Green)"
+                kubectl create namespace production --dry-run=client -o yaml | kubectl apply -f -
+                kubectl apply -n production -f - <<EOF
+                apiVersion: apps/v1
+                kind: Deployment
+                metadata:
+                  name: eventwebapp-prod
+                spec:
+                  replicas: 2
+                  selector:
+                    matchLabels:
+                      app: eventwebapp
+                  template:
+                    metadata:
+                      labels:
+                        app: eventwebapp
+                    spec:
+                      containers:
+                      - name: eventwebapp
+                        image: $(dockerImage)
+                        imagePullPolicy: Always
+                        ports:
+                        - containerPort: 8000
+                        env:
+                        - name: DJANGO_SETTINGS_MODULE
+                          value: eventmanagementwebapp.settings
+                        - name: DEBUG
+                          value: "True"
+                ---
+                apiVersion: v1
+                kind: Service
+                metadata:
+                  name: eventwebapp-service
+                spec:
+                  selector:
+                    app: eventwebapp
+                  ports:
+                  - port: 80
+                    targetPort: 8000
+                  type: LoadBalancer
+                EOF

@@ -1,0 +1,21 @@
+{% include 'navbar.html' %}
+
+{% block content %}
+
+
+<h1>Event List</h1>
+
+{% for bookedevent_obj in bookedevent %}
+<div class="card" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">{{bookedevent_obj.eventtype}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">{{bookedevent_obj.eventdate}}</h6>
+      <p class="card-text">{{bookedevent_obj.audiencecount}}</p>
+      <a href="#" class="card-link">Card link</a>
+      <a href="#" class="card-link">Another link</a>
+    </div>
+  </div>
+
+  {% endfor %}
+
+{% endblock content %}

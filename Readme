@@ -1,0 +1,53 @@
+📝 Project Description — Event Management WebApp
+
+The Event Management WebApp is a full-stack web application designed to simplify the process of organizing and managing events for both administrators and participants. It enables event organizers to create, update, and track events, while allowing users to register, view details, and manage their bookings—all from a single, user-friendly platform.
+
+The system provides role-based access control for Admins, Organizers, and Attendees, ensuring secure and structured operations. Admins can manage event categories, user data, and bookings, while attendees can explore upcoming events and register seamlessly.
+
+The project is built with Django (Python) for the backend, using HTML, CSS, JavaScript, and Bootstrap for the frontend. The database layer uses SQLite (can be extended to PostgreSQL or MySQL), and the application can be deployed in a Dockerized environment for scalability and portability.
+
+This project demonstrates practical implementation of CRUD operations, authentication, ORM models, and template-based rendering—making it ideal for real-world event management scenarios.
+
+
+
+🚀 Key Features
+
+Admin panel to manage events, categories, and users
+
+Event creation, editing, and deletion
+
+User registration and login with authentication system
+
+Event listing and detailed event view for users
+
+Booking and cancellation functionality
+
+Email notifications for registration confirmation
+
+Responsive web interface for desktop and mobile
+
+Docker support for easy deployment
+
+
+
+🧱 Tech Stack
+
+
+
+Backend: Django (Python)
+
+Frontend: HTML5, CSS3, JavaScript, Bootstrap
+
+Database: SQLite / PostgreSQL
+
+Containerization: Docker
+
+Version Control: GitHub
+
+Deployment: Azure Web App / Docker on Azure
+
+
+
+🎯 Objective
+
+To provide an end-to-end digital solution for managing events efficiently—reducing manual work for organizers, improving user experience for attendees, and enabling easy maintenance and scalability for developers.

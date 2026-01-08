@@ -1,0 +1,44 @@
+# 1. Prepare directory
+mkdir ~/zabbix && cd ~/zabbix
+
+# 2. Create docker-compose.yml
+vi docker-compose.yml
+
+
+
+# 3. Start Zabbix stack
+docker-compose up -d
+
+# 4. Verify containers
+docker ps
+
+# 5. Check Zabbix server startup
+docker logs zabbix-server | grep started
+
+# 6. Fix Zabbix web config (set ZBX_SERVER = 'zabbix-server')
+docker exec -it zabbix-web sh -c "sed -i \"s/\$ZBX_SERVER[[:space:]]*=[[:space:]]*getenv('ZBX_SERVER_HOST');/\$ZBX_SERVER = 'zabbix-server';/\" /etc/zabbix/web/zabbix.conf.php"
+
+# 7. Restart Zabbix web container
+docker restart zabbix-web
+
+# 8. Confirm config updated
+docker exec -it zabbix-web grep ZBX_SERVER /etc/zabbix/web/zabbix.conf.php
+
+
+on application vm
+
+# 1. Update and install Zabbix agent
+sudo apt update -y
+sudo apt install zabbix-agent -y
+
+# 2. Edit Zabbix agent config
+sudo sed -i 's/^Server=.*/Server=172.31.88.233,34.203.249.45/' /etc/zabbix/zabbix_agentd.conf
+sudo sed -i 's/^ServerActive=.*/ServerActive=172.31.88.233/' /etc/zabbix/zabbix_agentd.conf
+sudo sed -i 's/^# Hostname=.*/Hostname=App-EC2/' /etc/zabbix/zabbix_agentd.conf
+
+# 3. Restart agent
+sudo systemctl restart zabbix-agent
+sudo systemctl enable zabbix-agent
+
+# 4. Verify it’s listening
+sudo ss -tulnp | grep 10050

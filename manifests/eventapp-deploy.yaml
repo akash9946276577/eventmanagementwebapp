@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eventapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eventapp
+  template:
+    metadata:
+      labels:
+        app: eventapp
+    spec:
+      containers:
+      - name: eventapp
+        image: eventwebappacr.azurecr.io/event-management-app:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DJANGO_SETTINGS_MODULE
+          value: "eventmanagementwebapp.settings"
+        - name: DEBUG
+          value: "True"
